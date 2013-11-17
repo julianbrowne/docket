@@ -41,7 +41,7 @@ The output should look like this:
     1 bottles of mulled wine
     1 lbs of brocolli
     2 lbs of sugar
-    4 lbs of sprouts
+    4 lbs of sprouts                    << state change 3
     christmas                           << complex event matched
     3 packets of kitchen roll
     4 cans of dog food

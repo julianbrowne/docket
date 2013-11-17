@@ -7,6 +7,8 @@ A series of items are added to an imaginary shopping basket. As the state machin
 
 The state changes that trigger the state machine are the appearance of party crackers, sprouts and mince pies (in any order). As each trigger product is seen in the basket the state of the machine changes until the final one appears which triggers the "it's Christmas" event. Any other products have no effect on the state machine and the appearance of the same product more than once (mince pies followed by mince pies) simply causes the state machine to remain in the same state.
 
+![state machine](https://raw.github.com/julianbrowne/docket/master/lib/docket.png)
+
 The demo can easily be updated to represent other simple and complex events or modified to represent typical christmas purchases in other countries.
 
 To run the demo download the repository:

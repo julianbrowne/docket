@@ -1,7 +1,7 @@
 Docket
 ======
 
-Docket uses [postal](https://github.com/postaljs/postal.js), a node.js event bus and a [javascript finite state machine](https://github.com/jakesgordon/javascript-state-machine) to show how simple event pattern matching can work using state machines. The state machine changes are animated in the browser using [D3](https://github.com/mbostock/d3).
+Docket uses [postal](https://github.com/postaljs/postal.js), a node.js event bus and a [javascript finite state machine](https://github.com/jakesgordon/javascript-state-machine) to show how simple event pattern matching [can work using state machines](http://www.ics.uci.edu/~eppstein/161/960222.html). The state machine changes are animated in the browser using [D3](https://github.com/mbostock/d3).
 
 A series of items are added to an imaginary shopping basket. As the state machine checks each one (coffee, sugar, dog food, etc.) it's looking for clues that it's Christmas (a complex event, implied by other events).
 

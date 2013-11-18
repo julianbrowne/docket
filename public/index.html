@@ -1,0 +1,133 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
+    <title>Docket: Event-driven Pattern Matching Demo</title>
+    <style>
+        g.state circle { 
+            stroke-width : 0px;
+            stroke-dasharray: 4px;
+            stroke-opacity: 0.5;
+            fill : aliceblue;
+        }
+        g.state circle.active { 
+            stroke-width : 0px;
+            stroke-dasharray: 4px;
+            stroke-opacity: 0.5;
+            fill : red;
+        }
+        text.label { 
+            font-family: arial;
+            fill: #161933;
+        }
+        text.state-change-label { 
+            font-family: arial;
+            font-size: 12px;
+            fill: #000000;
+        }
+    </style>
+    <script src="/assets/javascripts/jquery-1.9.1.js"></script>
+    <script src="/assets/javascripts/d3.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(function() { 
+
+            var radius = 40;
+
+            var statesData = [ 
+                { id: 'u',  label1: 'unknown', x: 50, y: 250   },
+                { id: 'm',  label1: 'mince pies',  x: 250, y: 50  },
+                { id: 'c',  label1: 'crackers',  x: 250, y: 250 },
+                { id: 's',  label1: 'sprouts',  x: 250, y: 450 },
+                { id: 'cm', label1: 'crackers', label2: 'mince pies', x: 450, y: 50  },
+                { id: 'sm', label1: 'sprouts',  label2: 'mince pies', x: 450, y: 250 },
+                { id: 'sc', label1: 'sprouts',  label2: 'crackers', x: 450, y: 450 },
+                { id: 'x',  label1: 'christmas',  x: 650, y: 250 }
+            ];
+ 
+            var transitionsData = [ 
+                { from: 0, to: 3, label: 'sprouts' },
+                { from: 0, to: 2, label: 'crackers' },
+                { from: 0, to: 1, label: 'mince pies' },
+                { from: 3, to: 6, label: 'crackers' },
+                { from: 3, to: 5, label: 'mince pies' },
+                { from: 2, to: 6, label: 'sprouts' },
+                { from: 2, to: 4, label: 'mince pies' },
+                { from: 1, to: 5, label: 'sprouts' },
+                { from: 1, to: 4, label: 'crackers' },
+                { from: 6, to: 7, label: 'mince pies' },
+                { from: 5, to: 7, label: 'crackers' },
+                { from: 4, to: 7, label: 'sprouts' }
+            ];
+
+            svg = d3.select( '#state-machine')
+                .append("svg")
+                .attr("width", "960px")
+                .attr("height", "500px");
+
+            transitionsData.forEach(
+                function(transition){
+                    svg.append("line")
+                        .attr("x1", statesData[transition.from].x)
+                        .attr("y1", statesData[transition.from].y)
+                        .attr("x2", statesData[transition.to].x)
+                        .attr("y2", statesData[transition.to].y)
+                        .attr("stroke-width", 2)
+                        .attr("stroke", "#475592");
+                    svg.append("text")
+                        .attr("x", statesData[transition.from].x + ((statesData[transition.to].x-statesData[transition.from].x)/4))
+                        .attr("y", statesData[transition.from].y + ((statesData[transition.to].y-statesData[transition.from].y)/4) - 5)
+                        .attr('class', 'state-change-label')
+                        .text(transition.label);
+                }
+            );
+
+            var statesVis = svg
+                .selectAll( "g.state")
+                .data(statesData);
+  
+            var state = statesVis.enter()
+                .append( "g")
+                .attr({ 
+                    "transform": function( d) { return "translate("+ [d.x,d.y] + ")"; },
+                    'class': 'state'
+                });
+    
+            state.append( "circle")
+                .attr({ r : 50, 'class': function(d){return d.id} });
+
+            state.append("text")
+                .attr("text-anchor", "middle")
+                .attr('class', 'label')
+                .text(function(d) { return d.label1 });
+
+            state.append("text")
+                .attr("text-anchor", "middle")
+                .attr("y", 20)
+                .attr('class', 'label')
+                .text(function(d) { if(d.label2 !== undefined) return d.label2 });
+
+            socket = new io.connect('http://127.0.0.1');
+
+            socket.on('sale', function(data) { 
+                $('#event').html(JSON.stringify(data));
+            });
+
+            socket.on('state-change', function(data) { 
+                $('#state').append("<p>" + JSON.stringify(data) + "</p>");
+                svg = d3.select('circle.' + data.to)
+                    .attr('class', 'active');
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <h1>Christmas State Machine</h1>
+    <div id="event">
+    </div>
+    <div id="state-machine">
+    </div>
+    <div id="state">
+    </div>
+</body>
+</html>

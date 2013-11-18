@@ -21,7 +21,7 @@ And run it
 
     node docket
 
-The output should look like this:
+The console output should look like this:
 
     listening to sales / new
     3 grams of cheese
@@ -46,3 +46,10 @@ The output should look like this:
     3 packets of kitchen roll
     4 cans of dog food
     1 lbs of tea
+
+Each sales event published to the bus is also emitted on a "sale" channel on a websocket. Connecting the browser to  http://127.0.0.1:9000 will load a page to watch these.
+
+Similarly, for each state change, a web socket message is pushed on the "state-change" channel. This is used in the html page to animate a D3 state machine diagram showing the matching progress.
+
+![screen shot](https://raw.github.com/julianbrowne/docket/master/lib/screen-shot.png)
+

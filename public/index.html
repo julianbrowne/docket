@@ -3,6 +3,46 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Docket: Event-driven Pattern Matching Demo</title>
     <style>
+
+        #event, #state {
+            font-family: helvetica;
+            width: 850px;
+            border: 1px solid gray;
+            padding: 0 10px;
+            margin: 10px;
+        }
+
+        #event {
+            height: 40px;
+            font-size: 20px;
+            line-height: 40px;
+            color: red;
+            text-align: center;
+        }
+
+        #state { 
+            font-size: 16px;
+            line-height: 20px;
+        }
+
+        #state-machine { 
+            width: 850px;
+            height: 550px;
+            border: 1px solid gray;
+            padding: 0 10px;
+            margin: 10px;
+        }
+
+        h1 { 
+            width: 850px;
+            text-align: center;
+            font-family: helvetica;
+            font-size: 30px;
+            line-height: 40px;
+            padding: 10px;
+            margin: 10px;
+        }
+
         circle { 
             stroke-width : 0px;
             stroke-dasharray: 4px;
@@ -38,14 +78,14 @@
             var radius = 40;
 
             var statesData = [ 
-                { id: 'u',  label1: 'unknown', x: 50, y: 250   },
-                { id: 'm',  label1: 'mince pies',  x: 250, y: 50  },
-                { id: 'c',  label1: 'crackers',  x: 250, y: 250 },
-                { id: 's',  label1: 'sprouts',  x: 250, y: 450 },
-                { id: 'cm', label1: 'crackers', label2: 'mince pies', x: 450, y: 50  },
-                { id: 'sm', label1: 'sprouts',  label2: 'mince pies', x: 450, y: 250 },
-                { id: 'sc', label1: 'sprouts',  label2: 'crackers', x: 450, y: 450 },
-                { id: 'x',  label1: 'christmas',  x: 650, y: 250 }
+                { id: 'u',  label1: 'unknown', x: 100, y: 250   },
+                { id: 'm',  label1: 'mince pies',  x: 350, y: 50  },
+                { id: 'c',  label1: 'crackers',  x: 350, y: 250 },
+                { id: 's',  label1: 'sprouts',  x: 350, y: 450 },
+                { id: 'cm', label1: 'crackers', label2: 'mince pies', x: 550, y: 50  },
+                { id: 'sm', label1: 'sprouts',  label2: 'mince pies', x: 550, y: 250 },
+                { id: 'sc', label1: 'sprouts',  label2: 'crackers', x: 550, y: 450 },
+                { id: 'x',  label1: 'christmas',  x: 750, y: 250 }
             ];
  
             var transitionsData = [ 
@@ -137,13 +177,26 @@
             socket.on('state-reset', reset);
 
             socket.on('sale', function(data) { 
-                console.log("sale => " + JSON.stringify(data));
-                $('#event').html(JSON.stringify(data));
+                //console.log("sale => " + JSON.stringify(data));
+                $('#event').html("Event: " + data.quantity + " " + data.units + " " + data.product);
             });
+
+            function getLabel(id) { 
+                var label = "undefined";
+                for(var i=0; i<statesData.length; i++) { 
+                    if(statesData[i].id === id) { 
+                        label = statesData[i].label1;
+                        if(statesData[i].label2 !== undefined)
+                            label += ' + ' + statesData[i].label2;
+                        break;
+                    }
+                }
+                return label;
+            };
 
             socket.on('state-change', function(data) { 
 
-                $('#state').append("<p>" + JSON.stringify(data) + "</p>");
+                $('#state').append("<p>Received '" + data.event + "' event so changing state from '" + getLabel(data.from) + "' to '" + getLabel(data.to) + "'</p>");
 
                 svg = d3.select('circle.' + data.to)
                     .attr('class', function(d) { return 'active ' + d.id });
@@ -164,7 +217,7 @@
     </script>
 </head>
 <body>
-    <h1>Christmas State Machine</h1>
+    <h1>State Machine Demo</h1>
     <div id="event">
     </div>
     <div id="state-machine">

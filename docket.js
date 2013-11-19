@@ -5,13 +5,14 @@ var docket  = require('./lib/docket');
 var port    = 9000;
 var serv    = http.createServer(docket.handler);
 
-console.log('Starting HTTP server on http://127.0.0.1:' + port);
+console.log('Starting HTTP server');
 serv.listen(port);
 
 console.log('Starting WS server on ' + port);
 var ws   = serv.listen(port);
 var conn = sio.listen(ws, { log: false });
 
+console.log('Waiting for browser to connect at http://127.0.0.1:' + port);
 conn.sockets.on('connection', function (socket) { 
 
     console.log('Browser connected');

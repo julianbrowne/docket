@@ -23,29 +23,37 @@ And run it
 
 The console output should look like this:
 
+    Starting HTTP server
+    Starting WS server on 9000
+    Waiting for browser to connect at http://127.0.0.1:9000
+    Browser connected
     listening to sales / new
-    3 grams of cheese
-    1 boxes of crackers                 << state change 1
-    1 jars of coffee
-    2 lbs of rice
-    2 bottles of port
-    3 packets of mince pies             << state change 2
-    1 whole of chicken
-    2 bottles of milk
-    1 cans of air freshener
-    2 packets of twiglets
-    5 lbs of potatoes
-    4 boxes of chocolate orange
-    1 bottles of washing-up liquid
-    1 whole of goose
-    1 bottles of mulled wine
-    1 lbs of brocolli
-    2 lbs of sugar
-    4 lbs of sprouts                    << state change 3
-    christmas                           << complex event matched
-    3 packets of kitchen roll
-    4 cans of dog food
-    1 lbs of tea
+    Sold - 1 bottles of olive oil
+    Sold - 2 loaves of bread
+    Sold - 1 packs of butter
+    Sold - 1 litres of fabric conditioner
+    Sold - 3 grams of cheese
+    Sold - 1 boxes of crackers              << state change
+    Sold - 1 jars of coffee
+    Sold - 2 lbs of rice
+    Sold - 2 bottles of port
+    Sold - 3 packets of mince pies          << state change
+    Sold - 1 whole of chicken
+    Sold - 2 bottles of milk
+    Sold - 1 cans of air freshener
+    Sold - 2 packets of twiglets
+    Sold - 5 lbs of potatoes
+    Sold - 4 boxes of chocolate orange
+    Sold - 1 bottles of washing-up liquid
+    Sold - 1 whole of goose
+    Sold - 1 bottles of mulled wine
+    Sold - 1 lbs of brocolli
+    Sold - 2 lbs of sugar
+    Sold - 4 lbs of sprouts                 << state change
+    Woot - It's Christmas!                  << complex event matched
+    Sold - 3 packets of kitchen roll
+    Sold - 1 lbs of tea
+    Sold - 4 cans of dog food
 
 Each sales event published to the bus is also emitted on a "sale" channel on a websocket. Connecting the browser to  http://127.0.0.1:9000 will load a page to watch these.
 

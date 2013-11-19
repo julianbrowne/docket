@@ -3,22 +3,26 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Docket: Event-driven Pattern Matching Demo</title>
     <style>
-        g.state circle { 
+        circle { 
             stroke-width : 0px;
             stroke-dasharray: 4px;
             stroke-opacity: 0.5;
             fill : aliceblue;
         }
-        g.state circle.active { 
-            stroke-width : 0px;
-            stroke-dasharray: 4px;
-            stroke-opacity: 0.5;
+
+        circle.active { 
             fill : red;
         }
+
+        circle.was-active { 
+            fill : orange;
+        }
+
         text.label { 
             font-family: arial;
             fill: #161933;
         }
+
         text.state-change-label { 
             font-family: arial;
             font-size: 12px;
@@ -66,18 +70,24 @@
 
             transitionsData.forEach(
                 function(transition){
+
+                    var klass = statesData[transition.from].id + "-" + statesData[transition.to].id;
+
                     svg.append("line")
                         .attr("x1", statesData[transition.from].x)
                         .attr("y1", statesData[transition.from].y)
                         .attr("x2", statesData[transition.to].x)
                         .attr("y2", statesData[transition.to].y)
                         .attr("stroke-width", 2)
+                        .attr("class", klass)
                         .attr("stroke", "#475592");
+
                     svg.append("text")
                         .attr("x", statesData[transition.from].x + ((statesData[transition.to].x-statesData[transition.from].x)/4))
                         .attr("y", statesData[transition.from].y + ((statesData[transition.to].y-statesData[transition.from].y)/4) - 5)
-                        .attr('class', 'state-change-label')
+                        .attr('class', 'state-change-label ' + klass)
                         .text(transition.label);
+
                 }
             );
 
@@ -93,7 +103,8 @@
                 });
     
             state.append( "circle")
-                .attr({ r : 50, 'class': function(d){return d.id} });
+                .attr({r: 50})
+                .attr({'class': function(d){return d.id} });
 
             state.append("text")
                 .attr("text-anchor", "middle")
@@ -108,14 +119,45 @@
 
             socket = new io.connect('http://127.0.0.1');
 
+            window.onbeforeunload = function() { 
+                socket.onclose = function () {};
+                socket.disconnect()
+            };
+
+            function reset(data) { 
+                svg = d3.selectAll('circle')
+                    .classed('active', false)
+                    .classed('was-active', false)
+                    .attr('class', function(d) { return d.id });
+                svg = d3.select('circle.u')
+                    .attr('class', function(d) { return 'active ' + d.id });
+            };
+
+            socket.on('disconnect', reset);
+            socket.on('state-reset', reset);
+
             socket.on('sale', function(data) { 
+                console.log("sale => " + JSON.stringify(data));
                 $('#event').html(JSON.stringify(data));
             });
 
             socket.on('state-change', function(data) { 
+
                 $('#state').append("<p>" + JSON.stringify(data) + "</p>");
+
                 svg = d3.select('circle.' + data.to)
-                    .attr('class', 'active');
+                    .attr('class', function(d) { return 'active ' + d.id });
+
+                d3.select("line." + data.from + "-" + data.to)
+                    .attr("stroke-width", 4)
+                    .attr("stroke", "orange");
+
+                d3.select("text." + data.from + "-" + data.to)
+                    .attr("stroke", "orange");
+
+                svg = d3.select('circle.' + data.from)
+                    .classed('active', false)
+                    .attr('class', function(d) { return 'was-active ' + d.id });
             });
 
         });

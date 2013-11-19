@@ -1,61 +1,48 @@
 
 var sio     = require('socket.io');
 var http    = require('http');
-var content = require('node-static');
 var docket  = require('./lib/docket');
+var port    = 9000;
+var serv    = http.createServer(docket.handler);
 
-var file = new content.Server('./public');
+console.log('Starting HTTP server on http://127.0.0.1:' + port);
+serv.listen(port);
 
-var handler = function(request, response) { 
-    file.serve(request, response, function (err, res) { 
-        if (err) {
-            console.error("*** Error serving " + request.url + " - " + err.message);
-            response.writeHead(err.status, err.headers);
-            response.end();
-        } else {
-            console.log("> " + request.url + " - " + res.message);
-        }
-    });
-}
-
-var srv = http.createServer(handler);
-
-srv.listen(9000);
-
-console.log('Open browser to http://127.0.0.1:9000');
-console.log('Starting WS server on 9000');
-
-var ws = srv.listen(9000);
+console.log('Starting WS server on ' + port);
+var ws   = serv.listen(port);
 var conn = sio.listen(ws, { log: false });
 
 conn.sockets.on('connection', function (socket) { 
 
-    var p = new docket.Pipe(socket);
+    console.log('Browser connected');
 
-    console.log('Got connection');
+    var pipeline = new docket.Pipe(socket);
+    pipeline.listen("sales", "new");
 
-    p.listen("sales", "new");
-
-    p.sold(3, "grams", "cheese");
-    p.sold(1, "boxes", "crackers");
-    p.sold(1, "jars", "coffee");
-    p.sold(2, "lbs", "rice");
-    p.sold(2, "bottles", "port");
-    p.sold(3, "packets", "mince pies");
-    p.sold(1, "whole", "chicken");
-    p.sold(2, "bottles", "milk");
-    p.sold(1, "cans", "air freshener");
-    p.sold(2, "packets", "twiglets");
-    p.sold(5, "lbs", "potatoes");
-    p.sold(4, "boxes", "chocolate orange");
-    p.sold(1, "bottles", "washing-up liquid");
-    p.sold(1, "whole", "goose");
-    p.sold(1, "bottles", "mulled wine");
-    p.sold(1, "lbs", "brocolli");
-    p.sold(2, "lbs", "sugar");
-    p.sold(4, "lbs", "sprouts");
-    p.sold(3, "packets", "kitchen roll");
-    p.sold(1, "lbs", "tea");
-    p.sold(4, "cans", "dog food");
+    pipeline.sold(1, "bottles", "olive oil");
+    pipeline.sold(2, "loaves", "bread");
+    pipeline.sold(1, "packs", "butter");
+    pipeline.sold(1, "litres", "fabric conditioner");
+    pipeline.sold(3, "grams", "cheese");
+    pipeline.sold(1, "boxes", "crackers");
+    pipeline.sold(1, "jars", "coffee");
+    pipeline.sold(2, "lbs", "rice");
+    pipeline.sold(2, "bottles", "port");
+    pipeline.sold(3, "packets", "mince pies");
+    pipeline.sold(1, "whole", "chicken");
+    pipeline.sold(2, "bottles", "milk");
+    pipeline.sold(1, "cans", "air freshener");
+    pipeline.sold(2, "packets", "twiglets");
+    pipeline.sold(5, "lbs", "potatoes");
+    pipeline.sold(4, "boxes", "chocolate orange");
+    pipeline.sold(1, "bottles", "washing-up liquid");
+    pipeline.sold(1, "whole", "goose");
+    pipeline.sold(1, "bottles", "mulled wine");
+    pipeline.sold(1, "lbs", "brocolli");
+    pipeline.sold(2, "lbs", "sugar");
+    pipeline.sold(4, "lbs", "sprouts");
+    pipeline.sold(3, "packets", "kitchen roll");
+    pipeline.sold(1, "lbs", "tea");
+    pipeline.sold(4, "cans", "dog food");
 
 });

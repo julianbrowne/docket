@@ -1,0 +1,84 @@
+#event-log,
+#state-log { 
+    font-family: helvetica;
+    width: 850px;
+    border: 1px solid gray;
+    padding: 0 10px;
+    margin: 10px;
+}
+
+#event-log { 
+    height: 40px;
+    font-size: 20px;
+    line-height: 40px;
+    color: red;
+    text-align: center;
+}
+
+#state-log { 
+    font-size: 16px;
+    line-height: 20px;
+}
+
+#state-machine { 
+    width: 850px;
+    height: 550px;
+    border: 1px solid gray;
+    padding: 0 10px;
+    margin: 10px;
+}
+
+#start { 
+    color: #FFFFFF;
+    background-color: navy;
+    font-family: courier;
+    font-size: 18px;
+    width: 100px;
+    margin: 10px 375px;
+    display: block;
+    border-radius: 10px;
+    outline:none;
+}
+
+h1 { 
+    width: 850px;
+    text-align: center;
+    font-family: helvetica;
+    font-size: 30px;
+    line-height: 40px;
+    padding: 10px;
+    margin: 10px;
+}
+
+circle { 
+    fill : aliceblue;
+    stroke: black;
+    stroke-width : 2px;
+    stroke-dasharray: 4px;
+    stroke-opacity: 0.5;
+}
+
+circle.active { 
+    fill : red;
+    stroke-width : 4px;
+    stroke-dasharray: 0;
+    stroke-opacity: 1;
+}
+
+circle.was-active { 
+    fill : orange;
+    stroke-width : 2px;
+    stroke-dasharray: 0;
+    stroke-opacity: 1;
+}
+
+text.label { 
+    font-family: arial;
+    fill: #161933;
+}
+
+text.state-change-label { 
+    font-family: arial;
+    font-size: 12px;
+    fill: #000000;
+}

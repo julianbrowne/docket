@@ -2,244 +2,28 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF8">
     <title>Docket: Event-driven Pattern Matching Demo</title>
-    <style>
-
-        #event, #state {
-            font-family: helvetica;
-            width: 850px;
-            border: 1px solid gray;
-            padding: 0 10px;
-            margin: 10px;
-        }
-
-        #event {
-            height: 40px;
-            font-size: 20px;
-            line-height: 40px;
-            color: red;
-            text-align: center;
-        }
-
-        #state { 
-            font-size: 16px;
-            line-height: 20px;
-        }
-
-        #state-machine { 
-            width: 850px;
-            height: 550px;
-            border: 1px solid gray;
-            padding: 0 10px;
-            margin: 10px;
-        }
-
-        #start { 
-            color: #FFFFFF;
-            background-color: navy;
-            font-family: courier;
-            font-size: 18px;
-            width: 100px;
-            margin: 10px 375px;
-            display: block;
-            border-radius: 10px;
-            outline:none;
-        }
-
-        h1 { 
-            width: 850px;
-            text-align: center;
-            font-family: helvetica;
-            font-size: 30px;
-            line-height: 40px;
-            padding: 10px;
-            margin: 10px;
-        }
-
-        circle { 
-            stroke-width : 0px;
-            stroke-dasharray: 4px;
-            stroke-opacity: 0.5;
-            fill : aliceblue;
-        }
-
-        circle.active { 
-            fill : red;
-        }
-
-        circle.was-active { 
-            fill : orange;
-        }
-
-        text.label { 
-            font-family: arial;
-            fill: #161933;
-        }
-
-        text.state-change-label { 
-            font-family: arial;
-            font-size: 12px;
-            fill: #000000;
-        }
-    </style>
+    <link rel="stylesheet" media="all" href="/assets/stylesheets/style.css"/>
     <script src="/assets/javascripts/jquery-1.9.1.js"></script>
     <script src="/assets/javascripts/d3.js"></script>
+    <script src="/assets/javascripts/Docket.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        $(function() { 
-
-            var radius = 40;
-
-            var statesData = [ 
-                { id: 'u',  label1: 'unknown', x: 100, y: 250   },
-                { id: 'm',  label1: 'mince pies',  x: 350, y: 50  },
-                { id: 'c',  label1: 'crackers',  x: 350, y: 250 },
-                { id: 's',  label1: 'sprouts',  x: 350, y: 450 },
-                { id: 'cm', label1: 'crackers', label2: 'mince pies', x: 550, y: 50  },
-                { id: 'sm', label1: 'sprouts',  label2: 'mince pies', x: 550, y: 250 },
-                { id: 'sc', label1: 'sprouts',  label2: 'crackers', x: 550, y: 450 },
-                { id: 'x',  label1: 'christmas',  x: 750, y: 250 }
-            ];
- 
-            var transitionsData = [ 
-                { from: 0, to: 3, label: 'sprouts' },
-                { from: 0, to: 2, label: 'crackers' },
-                { from: 0, to: 1, label: 'mince pies' },
-                { from: 3, to: 6, label: 'crackers' },
-                { from: 3, to: 5, label: 'mince pies' },
-                { from: 2, to: 6, label: 'sprouts' },
-                { from: 2, to: 4, label: 'mince pies' },
-                { from: 1, to: 5, label: 'sprouts' },
-                { from: 1, to: 4, label: 'crackers' },
-                { from: 6, to: 7, label: 'mince pies' },
-                { from: 5, to: 7, label: 'crackers' },
-                { from: 4, to: 7, label: 'sprouts' }
-            ];
-
-            svg = d3.select( '#state-machine')
-                .append("svg")
-                .attr("width", "960px")
-                .attr("height", "500px");
-
-            transitionsData.forEach(
-                function(transition){
-
-                    var klass = statesData[transition.from].id + "-" + statesData[transition.to].id;
-
-                    svg.append("line")
-                        .attr("x1", statesData[transition.from].x)
-                        .attr("y1", statesData[transition.from].y)
-                        .attr("x2", statesData[transition.to].x)
-                        .attr("y2", statesData[transition.to].y)
-                        .attr("stroke-width", 2)
-                        .attr("class", klass)
-                        .attr("stroke", "#475592");
-
-                    svg.append("text")
-                        .attr("x", statesData[transition.from].x + ((statesData[transition.to].x-statesData[transition.from].x)/4))
-                        .attr("y", statesData[transition.from].y + ((statesData[transition.to].y-statesData[transition.from].y)/4) - 5)
-                        .attr('class', 'state-change-label ' + klass)
-                        .text(transition.label);
-
-                }
-            );
-
-            var statesVis = svg
-                .selectAll( "g.state")
-                .data(statesData);
-  
-            var state = statesVis.enter()
-                .append( "g")
-                .attr({ 
-                    "transform": function( d) { return "translate("+ [d.x,d.y] + ")"; },
-                    'class': 'state'
-                });
-    
-            state.append( "circle")
-                .attr({r: 50})
-                .attr({'class': function(d){return d.id} });
-
-            state.append("text")
-                .attr("text-anchor", "middle")
-                .attr('class', 'label')
-                .text(function(d) { return d.label1 });
-
-            state.append("text")
-                .attr("text-anchor", "middle")
-                .attr("y", 20)
-                .attr('class', 'label')
-                .text(function(d) { if(d.label2 !== undefined) return d.label2 });
-
-            socket = new io.connect('http://127.0.0.1');
-
-            window.onbeforeunload = function() { 
-                socket.onclose = function () {};
-                socket.disconnect()
-            };
-
-            function reset(data) { 
-                svg = d3.selectAll('circle')
-                    .classed('active', false)
-                    .classed('was-active', false)
-                    .attr('class', function(d) { return d.id });
-                svg = d3.select('circle.u')
-                    .attr('class', function(d) { return 'active ' + d.id });
-            };
-
-            socket.on('disconnect', reset);
-            socket.on('state-reset', reset);
-
-            socket.on('sale', function(data) { 
-                //console.log("sale => " + JSON.stringify(data));
-                $('#event').html("Event: " + data.quantity + " " + data.units + " " + data.product);
-            });
-
-            function getLabel(id) { 
-                var label = "undefined";
-                for(var i=0; i<statesData.length; i++) { 
-                    if(statesData[i].id === id) { 
-                        label = statesData[i].label1;
-                        if(statesData[i].label2 !== undefined)
-                            label += ' + ' + statesData[i].label2;
-                        break;
-                    }
-                }
-                return label;
-            };
-
-            socket.on('state-change', function(data) { 
-
-                $('#state').append("<p>Received '" + data.event + "' event so changing state from '" + getLabel(data.from) + "' to '" + getLabel(data.to) + "'</p>");
-
-                svg = d3.select('circle.' + data.to)
-                    .attr('class', function(d) { return 'active ' + d.id });
-
-                d3.select("line." + data.from + "-" + data.to)
-                    .attr("stroke-width", 4)
-                    .attr("stroke", "orange");
-
-                d3.select("text." + data.from + "-" + data.to)
-                    .attr("stroke", "orange");
-
-                svg = d3.select('circle.' + data.from)
-                    .classed('active', false)
-                    .attr('class', function(d) { return 'was-active ' + d.id });
-            });
-
-            $("#start").click(function(e) {
-                socket.emit('shop', { command: 'start' });
-            });
-
-        });
-    </script>
 </head>
 <body>
     <h1>Event-Driven State Machine Demo</h1>
     <button id='start'>shop!</button>
-    <div id="event">
-    </div>
-    <div id="state-machine">
-    </div>
-    <div id="state">
-    </div>
+    <div id="event-log"></div>
+    <div id="state-machine"></div>
+    <div id="state-log"></div>
+    <script>
+        $(function() { 
+
+            var d = new Docket();
+
+            $("#start").click(function(e) { 
+                d.start();
+            });
+
+        });
+    </script>
 </body>
 </html>

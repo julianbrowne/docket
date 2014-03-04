@@ -9,14 +9,14 @@ function Docket() {
     };
 
     this.statesData = [ 
-        { id: 'u',  label1: 'unknown', x: 100, y: 250   },
-        { id: 'm',  label1: 'mince pies',  x: 350, y: 50  },
-        { id: 'c',  label1: 'crackers',  x: 350, y: 250 },
-        { id: 's',  label1: 'sprouts',  x: 350, y: 450 },
-        { id: 'cm', label1: 'crackers', label2: 'mince pies', x: 550, y: 50  },
-        { id: 'sm', label1: 'sprouts',  label2: 'mince pies', x: 550, y: 250 },
-        { id: 'sc', label1: 'sprouts',  label2: 'crackers', x: 550, y: 450 },
-        { id: 'x',  label1: 'christmas',  x: 750, y: 250 }
+        { id: 'u',  label1: 'unknown', x: 70, y: 250   },
+        { id: 'm',  label1: 'mince pies',  x: 300, y: 50  },
+        { id: 'c',  label1: 'crackers',  x: 300, y: 250 },
+        { id: 's',  label1: 'sprouts',  x: 300, y: 450 },
+        { id: 'cm', label1: 'crackers', label2: 'mince pies', x: 520, y: 50  },
+        { id: 'sm', label1: 'sprouts',  label2: 'mince pies', x: 520, y: 250 },
+        { id: 'sc', label1: 'sprouts',  label2: 'crackers', x: 520, y: 450 },
+        { id: 'x',  label1: 'christmas',  x: 720, y: 250 }
     ];
 
     this.transitionsData = [ 
@@ -47,9 +47,7 @@ function Docket() {
                 .attr("y1", docket.statesData[transition.from].y)
                 .attr("x2", docket.statesData[transition.to].x)
                 .attr("y2", docket.statesData[transition.to].y)
-                .attr("stroke-width", 2)
-                .attr("class", klass)
-                .attr("stroke", "#475592");
+                .attr("class", klass);
             docket.svg.append("text")
                 .attr("x", docket.statesData[transition.from].x + ((docket.statesData[transition.to].x-docket.statesData[transition.from].x)/4))
                 .attr("y", docket.statesData[transition.from].y + ((docket.statesData[transition.to].y-docket.statesData[transition.from].y)/4) - 5)
@@ -71,7 +69,7 @@ function Docket() {
 
     this.state.append("circle")
         .attr({r: 50})
-        .attr({'class': function(d){return d.id} });
+        .attr({'class': function(d){ return d.id } });
 
     this.state.append("text")
         .attr("text-anchor", "middle")
@@ -104,23 +102,18 @@ function Docket() {
     });
 
     this.socket.on('state-change', function(data) { 
-
-        $(docket.ui.stateLog).append("<p>Received '" 
-            + data.event + "' event so changing state from '" 
-            + docket.getLabel(data.from) + "' to '" 
-            + docket.getLabel(data.to) + "'</p>");
-
+        $(docket.ui.stateLog).append(
+            '<span class="event-log-event-type">Received "' + data.event + '" event </span>'
+            + '<span class="event-log-event-action">&nbsp;changing state from "' 
+            + docket.getLabel(data.from) + '" to "' 
+            + docket.getLabel(data.to) + '"</span><br/>');
         docket.svg = d3.select('circle.' + data.to)
             .attr('class', function(d) { return 'active ' + d.id });
-
         d3.select("line." + data.from + "-" + data.to)
-            .attr("stroke-width", 4)
-            .attr("stroke", "orange");
-
+            .classed('traversed', true);
         d3.select("text." + data.from + "-" + data.to)
-            .attr("stroke", "orange");
-
-        svg = d3.select('circle.' + data.from)
+            .classed('traversed', true);
+        docket.svg = d3.select('circle.' + data.from)
             .classed('active', false)
             .attr('class', function(d) { return 'was-active ' + d.id });
     });

@@ -10,7 +10,7 @@
 </head>
 <body>
     <h1>Event-Driven State Machine Demo</h1>
-    <button id='start'>shop!</button>
+    <button id='start'>shop</button>
     <div id="event-log"></div>
     <div id="state-machine"></div>
     <div id="state-log"></div>
@@ -21,6 +21,7 @@
 
             $("#start").click(function(e) { 
                 d.start();
+                $("#start").attr('disabled', true);
             });
 
         });
